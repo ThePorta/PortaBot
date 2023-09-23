@@ -14,8 +14,8 @@ import (
 
 	"github.com/ThePorta/PortaBot/config"
 	"github.com/ThePorta/PortaBot/redis"
-	"github.com/ThePorta/PortaBot/types"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/w3"
 	"github.com/lmittmann/w3/module/eth"
@@ -38,15 +38,14 @@ func init() {
 	logrus.SetLevel(logLevel)
 	s := rand.NewSource(time.Now().UnixNano())
 	rng = rand.New(s)
+}
 
+func main() {
 	db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
 	if err != nil {
 		logrus.WithError(err).Fatal("redis db is not a number")
 	}
 	redisClient = redis.NewRedis(os.Getenv("REDIS_ADDR"), os.Getenv("REDIS_PWD"), db)
-}
-
-func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, os.Interrupt, syscall.SIGQUIT)
@@ -111,20 +110,36 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 					eth.CallFunc(w3.A(token.Address), funcAllowance, w3.A(account), w3.A(maliciousAddress)).Returns(&allowanceAmount),
 				)
 				if allowanceAmount.Cmp(big.NewInt(0)) > 0 {
-					revokeMsg := types.Revoke{
-						AccountAddress:   account,
-						TokenAddress:     token.Address,
-						MaliciousAddress: maliciousAddress,
-					}
-					redisClient.Publish(ctx, redis.REVOKE, revokeMsg)
-					accountInfo, err := redisClient.GetAccountInfo(ctx, account)
+					chatId, err := redisClient.GetAccountInfo(ctx, account)
 					if err != nil {
 						logrus.WithError(err).Errorf("checkApprove: get account from redis, account: %s", account)
 					}
-					msg := tgbotapi.NewMessage(accountInfo.ChatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please forward revoke tx via wallet connect", account, maliciousAddress, allowanceAmount.String(), token.Name, chain.ChainName))
+					uuidStr := uuid.New().String()
+					signInputData, err := getApproveInputData(maliciousAddress)
+					if err != nil {
+						logrus.WithError(err).Error("checkApprove: encode input data")
+						continue
+					}
+					err = redisClient.SetInputData(ctx, uuidStr, account, signInputData)
+					if err != nil {
+						logrus.WithError(err).Error("checkApprove: set input data")
+						continue
+					}
+
+					msg := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please open %s/%s to revoke", account, maliciousAddress, allowanceAmount.String(), token.Name, chain.ChainName, config.URL, uuidStr))
 					bot.Send(msg)
 				}
 			}
 		}
 	}
+}
+
+func getApproveInputData(maliciousAddress string) ([]byte, error) {
+	funcApprove := w3.MustNewFunc("approve(address,uint256)", "bool")
+	input, err := funcApprove.EncodeArgs(w3.A(maliciousAddress), big.NewInt(0))
+	if err != nil {
+		logrus.WithError(err).Errorf("getApproveInputData: encode args: malicious address: %s", maliciousAddress)
+		return nil, err
+	}
+	return input, nil
 }

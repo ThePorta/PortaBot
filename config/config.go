@@ -12,6 +12,8 @@ type ChainConfig struct {
 	SupportedTokens []*Token
 }
 
+const URL = "localhost:3000"
+
 var ChainConfigs = []*ChainConfig{
 	{
 		ChainName:   "Polygon",

@@ -9,8 +9,8 @@ import (
 	"github.com/tinylib/msgp/msgp"
 )
 
-func TestMarshalUnmarshalAccountInfo(t *testing.T) {
-	v := AccountInfo{}
+func TestMarshalUnmarshalAccountAndInputData(t *testing.T) {
+	v := AccountAndInputData{}
 	bts, err := v.MarshalMsg(nil)
 	if err != nil {
 		t.Fatal(err)
@@ -32,8 +32,8 @@ func TestMarshalUnmarshalAccountInfo(t *testing.T) {
 	}
 }
 
-func BenchmarkMarshalMsgAccountInfo(b *testing.B) {
-	v := AccountInfo{}
+func BenchmarkMarshalMsgAccountAndInputData(b *testing.B) {
+	v := AccountAndInputData{}
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -41,8 +41,8 @@ func BenchmarkMarshalMsgAccountInfo(b *testing.B) {
 	}
 }
 
-func BenchmarkAppendMsgAccountInfo(b *testing.B) {
-	v := AccountInfo{}
+func BenchmarkAppendMsgAccountAndInputData(b *testing.B) {
+	v := AccountAndInputData{}
 	bts := make([]byte, 0, v.Msgsize())
 	bts, _ = v.MarshalMsg(bts[0:0])
 	b.SetBytes(int64(len(bts)))
@@ -53,8 +53,8 @@ func BenchmarkAppendMsgAccountInfo(b *testing.B) {
 	}
 }
 
-func BenchmarkUnmarshalAccountInfo(b *testing.B) {
-	v := AccountInfo{}
+func BenchmarkUnmarshalAccountAndInputData(b *testing.B) {
+	v := AccountAndInputData{}
 	bts, _ := v.MarshalMsg(nil)
 	b.ReportAllocs()
 	b.SetBytes(int64(len(bts)))
@@ -67,17 +67,17 @@ func BenchmarkUnmarshalAccountInfo(b *testing.B) {
 	}
 }
 
-func TestEncodeDecodeAccountInfo(t *testing.T) {
-	v := AccountInfo{}
+func TestEncodeDecodeAccountAndInputData(t *testing.T) {
+	v := AccountAndInputData{}
 	var buf bytes.Buffer
 	msgp.Encode(&buf, &v)
 
 	m := v.Msgsize()
 	if buf.Len() > m {
-		t.Log("WARNING: TestEncodeDecodeAccountInfo Msgsize() is inaccurate")
+		t.Log("WARNING: TestEncodeDecodeAccountAndInputData Msgsize() is inaccurate")
 	}
 
-	vn := AccountInfo{}
+	vn := AccountAndInputData{}
 	err := msgp.Decode(&buf, &vn)
 	if err != nil {
 		t.Error(err)
@@ -91,8 +91,8 @@ func TestEncodeDecodeAccountInfo(t *testing.T) {
 	}
 }
 
-func BenchmarkEncodeAccountInfo(b *testing.B) {
-	v := AccountInfo{}
+func BenchmarkEncodeAccountAndInputData(b *testing.B) {
+	v := AccountAndInputData{}
 	var buf bytes.Buffer
 	msgp.Encode(&buf, &v)
 	b.SetBytes(int64(buf.Len()))
@@ -105,121 +105,8 @@ func BenchmarkEncodeAccountInfo(b *testing.B) {
 	en.Flush()
 }
 
-func BenchmarkDecodeAccountInfo(b *testing.B) {
-	v := AccountInfo{}
-	var buf bytes.Buffer
-	msgp.Encode(&buf, &v)
-	b.SetBytes(int64(buf.Len()))
-	rd := msgp.NewEndlessReader(buf.Bytes(), b)
-	dc := msgp.NewReader(rd)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		err := v.DecodeMsg(dc)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func TestMarshalUnmarshalRevoke(t *testing.T) {
-	v := Revoke{}
-	bts, err := v.MarshalMsg(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	left, err := v.UnmarshalMsg(bts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(left) > 0 {
-		t.Errorf("%d bytes left over after UnmarshalMsg(): %q", len(left), left)
-	}
-
-	left, err = msgp.Skip(bts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(left) > 0 {
-		t.Errorf("%d bytes left over after Skip(): %q", len(left), left)
-	}
-}
-
-func BenchmarkMarshalMsgRevoke(b *testing.B) {
-	v := Revoke{}
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		v.MarshalMsg(nil)
-	}
-}
-
-func BenchmarkAppendMsgRevoke(b *testing.B) {
-	v := Revoke{}
-	bts := make([]byte, 0, v.Msgsize())
-	bts, _ = v.MarshalMsg(bts[0:0])
-	b.SetBytes(int64(len(bts)))
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		bts, _ = v.MarshalMsg(bts[0:0])
-	}
-}
-
-func BenchmarkUnmarshalRevoke(b *testing.B) {
-	v := Revoke{}
-	bts, _ := v.MarshalMsg(nil)
-	b.ReportAllocs()
-	b.SetBytes(int64(len(bts)))
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, err := v.UnmarshalMsg(bts)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func TestEncodeDecodeRevoke(t *testing.T) {
-	v := Revoke{}
-	var buf bytes.Buffer
-	msgp.Encode(&buf, &v)
-
-	m := v.Msgsize()
-	if buf.Len() > m {
-		t.Log("WARNING: TestEncodeDecodeRevoke Msgsize() is inaccurate")
-	}
-
-	vn := Revoke{}
-	err := msgp.Decode(&buf, &vn)
-	if err != nil {
-		t.Error(err)
-	}
-
-	buf.Reset()
-	msgp.Encode(&buf, &v)
-	err = msgp.NewReader(&buf).Skip()
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func BenchmarkEncodeRevoke(b *testing.B) {
-	v := Revoke{}
-	var buf bytes.Buffer
-	msgp.Encode(&buf, &v)
-	b.SetBytes(int64(buf.Len()))
-	en := msgp.NewWriter(msgp.Nowhere)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		v.EncodeMsg(en)
-	}
-	en.Flush()
-}
-
-func BenchmarkDecodeRevoke(b *testing.B) {
-	v := Revoke{}
+func BenchmarkDecodeAccountAndInputData(b *testing.B) {
+	v := AccountAndInputData{}
 	var buf bytes.Buffer
 	msgp.Encode(&buf, &v)
 	b.SetBytes(int64(buf.Len()))

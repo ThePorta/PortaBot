@@ -7,135 +7,7 @@ import (
 )
 
 // DecodeMsg implements msgp.Decodable
-func (z *AccountInfo) DecodeMsg(dc *msgp.Reader) (err error) {
-	var field []byte
-	_ = field
-	var zb0001 uint32
-	zb0001, err = dc.ReadMapHeader()
-	if err != nil {
-		err = msgp.WrapError(err)
-		return
-	}
-	for zb0001 > 0 {
-		zb0001--
-		field, err = dc.ReadMapKeyPtr()
-		if err != nil {
-			err = msgp.WrapError(err)
-			return
-		}
-		switch msgp.UnsafeString(field) {
-		case "WalletConnectSession":
-			z.WalletConnectSession, err = dc.ReadString()
-			if err != nil {
-				err = msgp.WrapError(err, "WalletConnectSession")
-				return
-			}
-		case "ChatId":
-			z.ChatId, err = dc.ReadInt64()
-			if err != nil {
-				err = msgp.WrapError(err, "ChatId")
-				return
-			}
-		default:
-			err = dc.Skip()
-			if err != nil {
-				err = msgp.WrapError(err)
-				return
-			}
-		}
-	}
-	return
-}
-
-// EncodeMsg implements msgp.Encodable
-func (z AccountInfo) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 2
-	// write "WalletConnectSession"
-	err = en.Append(0x82, 0xb4, 0x57, 0x61, 0x6c, 0x6c, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e)
-	if err != nil {
-		return
-	}
-	err = en.WriteString(z.WalletConnectSession)
-	if err != nil {
-		err = msgp.WrapError(err, "WalletConnectSession")
-		return
-	}
-	// write "ChatId"
-	err = en.Append(0xa6, 0x43, 0x68, 0x61, 0x74, 0x49, 0x64)
-	if err != nil {
-		return
-	}
-	err = en.WriteInt64(z.ChatId)
-	if err != nil {
-		err = msgp.WrapError(err, "ChatId")
-		return
-	}
-	return
-}
-
-// MarshalMsg implements msgp.Marshaler
-func (z AccountInfo) MarshalMsg(b []byte) (o []byte, err error) {
-	o = msgp.Require(b, z.Msgsize())
-	// map header, size 2
-	// string "WalletConnectSession"
-	o = append(o, 0x82, 0xb4, 0x57, 0x61, 0x6c, 0x6c, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e)
-	o = msgp.AppendString(o, z.WalletConnectSession)
-	// string "ChatId"
-	o = append(o, 0xa6, 0x43, 0x68, 0x61, 0x74, 0x49, 0x64)
-	o = msgp.AppendInt64(o, z.ChatId)
-	return
-}
-
-// UnmarshalMsg implements msgp.Unmarshaler
-func (z *AccountInfo) UnmarshalMsg(bts []byte) (o []byte, err error) {
-	var field []byte
-	_ = field
-	var zb0001 uint32
-	zb0001, bts, err = msgp.ReadMapHeaderBytes(bts)
-	if err != nil {
-		err = msgp.WrapError(err)
-		return
-	}
-	for zb0001 > 0 {
-		zb0001--
-		field, bts, err = msgp.ReadMapKeyZC(bts)
-		if err != nil {
-			err = msgp.WrapError(err)
-			return
-		}
-		switch msgp.UnsafeString(field) {
-		case "WalletConnectSession":
-			z.WalletConnectSession, bts, err = msgp.ReadStringBytes(bts)
-			if err != nil {
-				err = msgp.WrapError(err, "WalletConnectSession")
-				return
-			}
-		case "ChatId":
-			z.ChatId, bts, err = msgp.ReadInt64Bytes(bts)
-			if err != nil {
-				err = msgp.WrapError(err, "ChatId")
-				return
-			}
-		default:
-			bts, err = msgp.Skip(bts)
-			if err != nil {
-				err = msgp.WrapError(err)
-				return
-			}
-		}
-	}
-	o = bts
-	return
-}
-
-// Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z AccountInfo) Msgsize() (s int) {
-	s = 1 + 21 + msgp.StringPrefixSize + len(z.WalletConnectSession) + 7 + msgp.Int64Size
-	return
-}
-
-// DecodeMsg implements msgp.Decodable
-func (z *Revoke) DecodeMsg(dc *msgp.Reader) (err error) {
+func (z *AccountAndInputData) DecodeMsg(dc *msgp.Reader) (err error) {
 	var field []byte
 	_ = field
 	var zb0001 uint32
@@ -158,16 +30,10 @@ func (z *Revoke) DecodeMsg(dc *msgp.Reader) (err error) {
 				err = msgp.WrapError(err, "AccountAddress")
 				return
 			}
-		case "TokenAddress":
-			z.TokenAddress, err = dc.ReadString()
+		case "InputData":
+			z.InputData, err = dc.ReadBytes(z.InputData)
 			if err != nil {
-				err = msgp.WrapError(err, "TokenAddress")
-				return
-			}
-		case "MaliciousAddress":
-			z.MaliciousAddress, err = dc.ReadString()
-			if err != nil {
-				err = msgp.WrapError(err, "MaliciousAddress")
+				err = msgp.WrapError(err, "InputData")
 				return
 			}
 		default:
@@ -182,10 +48,10 @@ func (z *Revoke) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z Revoke) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 3
+func (z *AccountAndInputData) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 2
 	// write "AccountAddress"
-	err = en.Append(0x83, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
+	err = en.Append(0x82, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
 	if err != nil {
 		return
 	}
@@ -194,47 +60,34 @@ func (z Revoke) EncodeMsg(en *msgp.Writer) (err error) {
 		err = msgp.WrapError(err, "AccountAddress")
 		return
 	}
-	// write "TokenAddress"
-	err = en.Append(0xac, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
+	// write "InputData"
+	err = en.Append(0xa9, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x44, 0x61, 0x74, 0x61)
 	if err != nil {
 		return
 	}
-	err = en.WriteString(z.TokenAddress)
+	err = en.WriteBytes(z.InputData)
 	if err != nil {
-		err = msgp.WrapError(err, "TokenAddress")
-		return
-	}
-	// write "MaliciousAddress"
-	err = en.Append(0xb0, 0x4d, 0x61, 0x6c, 0x69, 0x63, 0x69, 0x6f, 0x75, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
-	if err != nil {
-		return
-	}
-	err = en.WriteString(z.MaliciousAddress)
-	if err != nil {
-		err = msgp.WrapError(err, "MaliciousAddress")
+		err = msgp.WrapError(err, "InputData")
 		return
 	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z Revoke) MarshalMsg(b []byte) (o []byte, err error) {
+func (z *AccountAndInputData) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 3
+	// map header, size 2
 	// string "AccountAddress"
-	o = append(o, 0x83, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
+	o = append(o, 0x82, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
 	o = msgp.AppendString(o, z.AccountAddress)
-	// string "TokenAddress"
-	o = append(o, 0xac, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
-	o = msgp.AppendString(o, z.TokenAddress)
-	// string "MaliciousAddress"
-	o = append(o, 0xb0, 0x4d, 0x61, 0x6c, 0x69, 0x63, 0x69, 0x6f, 0x75, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
-	o = msgp.AppendString(o, z.MaliciousAddress)
+	// string "InputData"
+	o = append(o, 0xa9, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x44, 0x61, 0x74, 0x61)
+	o = msgp.AppendBytes(o, z.InputData)
 	return
 }
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *Revoke) UnmarshalMsg(bts []byte) (o []byte, err error) {
+func (z *AccountAndInputData) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var field []byte
 	_ = field
 	var zb0001 uint32
@@ -257,16 +110,10 @@ func (z *Revoke) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				err = msgp.WrapError(err, "AccountAddress")
 				return
 			}
-		case "TokenAddress":
-			z.TokenAddress, bts, err = msgp.ReadStringBytes(bts)
+		case "InputData":
+			z.InputData, bts, err = msgp.ReadBytesBytes(bts, z.InputData)
 			if err != nil {
-				err = msgp.WrapError(err, "TokenAddress")
-				return
-			}
-		case "MaliciousAddress":
-			z.MaliciousAddress, bts, err = msgp.ReadStringBytes(bts)
-			if err != nil {
-				err = msgp.WrapError(err, "MaliciousAddress")
+				err = msgp.WrapError(err, "InputData")
 				return
 			}
 		default:
@@ -282,7 +129,7 @@ func (z *Revoke) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z Revoke) Msgsize() (s int) {
-	s = 1 + 15 + msgp.StringPrefixSize + len(z.AccountAddress) + 13 + msgp.StringPrefixSize + len(z.TokenAddress) + 17 + msgp.StringPrefixSize + len(z.MaliciousAddress)
+func (z *AccountAndInputData) Msgsize() (s int) {
+	s = 1 + 15 + msgp.StringPrefixSize + len(z.AccountAddress) + 10 + msgp.BytesPrefixSize + len(z.InputData)
 	return
 }

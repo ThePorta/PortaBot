@@ -14,6 +14,7 @@ const (
 
 	// accounts keys
 	ACCOUNT_INFO = "account"
+	UUID         = "uuid"
 )
 
 type Redis struct {
@@ -26,6 +27,12 @@ func NewRedis(addr string, password string, db int) *Redis {
 		Password: password,
 		DB:       db,
 	})
+	cmd := rdb.Ping(context.Background())
+	if err := cmd.Err(); err != nil {
+		logrus.WithError(err).Fatal("redis ping")
+	}
+	logrus.Info("connected redis")
+
 	return &Redis{
 		redis: rdb,
 	}
