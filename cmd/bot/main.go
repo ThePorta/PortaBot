@@ -75,7 +75,7 @@ func main() {
 		case update := <-updates:
 			if strings.Compare(update.Message.Text, "/start") == 0 {
 				optCode := generateOptCode()
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Hello %s, Your OPT code is: %s", update.Message.From.FirstName, optCode))
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Hello %s, Your OTP code is: %s", update.Message.From.FirstName, optCode))
 				bot.Send(msg)
 			}
 		case maliciousAddress := <-maliciousAddressCh:
