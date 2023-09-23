@@ -6,6 +6,7 @@ type Token struct {
 }
 
 type ChainConfig struct {
+	ChainName               string
 	ChainId                 int
 	EndpointUrl             string
 	SupportedTokenAddresses []*Token
@@ -13,6 +14,7 @@ type ChainConfig struct {
 
 var ChainConfigs = []*ChainConfig{
 	{
+		ChainName:   "Polygon",
 		ChainId:     137,
 		EndpointUrl: "https://polygon.llamarpc.com",
 		SupportedTokenAddresses: []*Token{
@@ -27,6 +29,7 @@ var ChainConfigs = []*ChainConfig{
 		},
 	},
 	{
+		ChainName:   "Gnosis Chain",
 		ChainId:     100,
 		EndpointUrl: "https://rpc.gnosischain.com",
 		SupportedTokenAddresses: []*Token{
@@ -41,6 +44,7 @@ var ChainConfigs = []*ChainConfig{
 		},
 	},
 	{
+		ChainName:   "Arbitrum One",
 		ChainId:     42161,
 		EndpointUrl: "https://arbitrum.llamarpc.com",
 		SupportedTokenAddresses: []*Token{
@@ -55,6 +59,7 @@ var ChainConfigs = []*ChainConfig{
 		},
 	},
 	{
+		ChainName:   "Base",
 		ChainId:     8453,
 		EndpointUrl: "https://base-mainnet.public.blastapi.io",
 		SupportedTokenAddresses: []*Token{

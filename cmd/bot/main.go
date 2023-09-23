@@ -6,16 +6,19 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/ThePorta/PortaBot/redis"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
 var rng *rand.Rand
+var redisClient *redis.Redis
 
 func init() {
 	err := godotenv.Load(".env")
@@ -30,6 +33,12 @@ func init() {
 	logrus.SetLevel(logLevel)
 	s := rand.NewSource(time.Now().UnixNano())
 	rng = rand.New(s)
+
+	db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		logrus.WithError(err).Fatal("redis db is not a number")
+	}
+	redisClient = redis.NewRedis(os.Getenv("REDIS_ADDR"), os.Getenv("REDIS_PWD"), db)
 }
 
 func main() {
@@ -52,6 +61,8 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 	logrus.Info("start bot")
 
+	maliciousAddressCh := redisClient.PSub(ctx, "maliciousAddress")
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -63,10 +74,20 @@ func main() {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Hello %s, Your OPT code is: %s", update.Message.From.FirstName, optCode))
 				bot.Send(msg)
 			}
+		case maliciousAddress := <-maliciousAddressCh:
+			checkApprove(ctx, maliciousAddress.Payload)
 		}
 	}
 }
 
 func generateOptCode() string {
 	return fmt.Sprintf("%06d", rng.Intn(1000000))
+}
+
+func checkApprove(ctx context.Context, maliciousAddress string) {
+	accounts, err := redisClient.GetAllAccounts(ctx)
+	if err != nil {
+		logrus.WithError(err).Error("checkApprove: fail to get all accounts")
+		return
+	}
 }

@@ -6,6 +6,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+const (
+	ACCOUNT_INFO = "account"
+)
+
 type Redis struct {
 	redis *redis.Client
 }
