@@ -6,10 +6,10 @@ type Token struct {
 }
 
 type ChainConfig struct {
-	ChainName               string
-	ChainId                 int
-	EndpointUrl             string
-	SupportedTokenAddresses []*Token
+	ChainName       string
+	ChainId         int
+	EndpointUrl     string
+	SupportedTokens []*Token
 }
 
 var ChainConfigs = []*ChainConfig{
@@ -17,7 +17,7 @@ var ChainConfigs = []*ChainConfig{
 		ChainName:   "Polygon",
 		ChainId:     137,
 		EndpointUrl: "https://polygon.llamarpc.com",
-		SupportedTokenAddresses: []*Token{
+		SupportedTokens: []*Token{
 			{
 				Address: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
 				Name:    "USDC",
@@ -32,7 +32,7 @@ var ChainConfigs = []*ChainConfig{
 		ChainName:   "Gnosis Chain",
 		ChainId:     100,
 		EndpointUrl: "https://rpc.gnosischain.com",
-		SupportedTokenAddresses: []*Token{
+		SupportedTokens: []*Token{
 			{
 				Address: "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
 				Name:    "USDC",
@@ -47,7 +47,7 @@ var ChainConfigs = []*ChainConfig{
 		ChainName:   "Arbitrum One",
 		ChainId:     42161,
 		EndpointUrl: "https://arbitrum.llamarpc.com",
-		SupportedTokenAddresses: []*Token{
+		SupportedTokens: []*Token{
 			{
 				Address: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
 				Name:    "USDC",
@@ -62,7 +62,7 @@ var ChainConfigs = []*ChainConfig{
 		ChainName:   "Base",
 		ChainId:     8453,
 		EndpointUrl: "https://base-mainnet.public.blastapi.io",
-		SupportedTokenAddresses: []*Token{
+		SupportedTokens: []*Token{
 			{
 				Address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
 				Name:    "USDC",

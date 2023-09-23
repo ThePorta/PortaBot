@@ -4,5 +4,12 @@ package types
 
 type AccountInfo struct {
 	WalletConnectSession string
-	ChatId               string
+	ChatId               int64
+}
+
+type Revoke struct {
+	AccountAddress   string `json:"accountAddress"`
+	TokenAddress     string `json:"tokenAddress"`
+	MaliciousAddress string `json:"maliciousAddress"`
+	ChatId           string `json:"chatId"`
 }

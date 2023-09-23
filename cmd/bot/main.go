@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"math/big"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -11,9 +12,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ThePorta/PortaBot/config"
 	"github.com/ThePorta/PortaBot/redis"
+	"github.com/ThePorta/PortaBot/types"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
+	"github.com/lmittmann/w3"
+	"github.com/lmittmann/w3/module/eth"
 	"github.com/sirupsen/logrus"
 )
 
@@ -61,7 +66,7 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 	logrus.Info("start bot")
 
-	maliciousAddressCh := redisClient.PSub(ctx, "maliciousAddress")
+	maliciousAddressCh := redisClient.PSub(ctx, redis.MALICIOUS_ALTER)
 
 	for {
 		select {
@@ -75,7 +80,7 @@ func main() {
 				bot.Send(msg)
 			}
 		case maliciousAddress := <-maliciousAddressCh:
-			checkApprove(ctx, maliciousAddress.Payload)
+			checkApprove(ctx, maliciousAddress.Payload, bot)
 		}
 	}
 }
@@ -84,10 +89,42 @@ func generateOptCode() string {
 	return fmt.Sprintf("%06d", rng.Intn(1000000))
 }
 
-func checkApprove(ctx context.Context, maliciousAddress string) {
+func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.BotAPI) {
 	accounts, err := redisClient.GetAllAccounts(ctx)
 	if err != nil {
 		logrus.WithError(err).Error("checkApprove: fail to get all accounts")
 		return
+	}
+
+	for _, chain := range config.ChainConfigs {
+		client, err := w3.Dial(chain.EndpointUrl)
+		if err != nil {
+			logrus.WithError(err).Errorf("checkApprove: dial %s", chain.EndpointUrl)
+			continue
+		}
+		defer client.Close()
+		funcAllowance := w3.MustNewFunc("allowance(address,address)", "uint256")
+		for _, token := range chain.SupportedTokens {
+			for _, account := range accounts {
+				var allowanceAmount big.Int
+				client.Call(
+					eth.CallFunc(w3.A(token.Address), funcAllowance, w3.A(account), w3.A(maliciousAddress)).Returns(&allowanceAmount),
+				)
+				if allowanceAmount.Cmp(big.NewInt(0)) > 0 {
+					revokeMsg := types.Revoke{
+						AccountAddress:   account,
+						TokenAddress:     token.Address,
+						MaliciousAddress: maliciousAddress,
+					}
+					redisClient.Publish(ctx, redis.REVOKE, revokeMsg)
+					accountInfo, err := redisClient.GetAccountInfo(ctx, account)
+					if err != nil {
+						logrus.WithError(err).Errorf("checkApprove: get account from redis, account: %s", account)
+					}
+					msg := tgbotapi.NewMessage(accountInfo.ChatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please forward revoke tx via wallet connect", account, maliciousAddress, allowanceAmount.String(), token.Name, chain.ChainName))
+					bot.Send(msg)
+				}
+			}
+		}
 	}
 }
