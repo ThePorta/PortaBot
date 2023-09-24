@@ -38,14 +38,14 @@ func init() {
 	logrus.SetLevel(logLevel)
 	s := rand.NewSource(time.Now().UnixNano())
 	rng = rand.New(s)
-}
-
-func main() {
 	db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
 	if err != nil {
 		logrus.WithError(err).Fatal("redis db is not a number")
 	}
 	redisClient = redis.NewRedis(os.Getenv("REDIS_ADDR"), os.Getenv("REDIS_PWD"), db)
+}
+
+func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, os.Interrupt, syscall.SIGQUIT)
@@ -120,7 +120,7 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 						logrus.WithError(err).Error("checkApprove: encode input data")
 						continue
 					}
-					err = redisClient.SetInputData(ctx, uuidStr, account, signInputData)
+					err = redisClient.SetInputData(ctx, uuidStr, account, signInputData, chain.ChainId, chain.ChainName, token.Address)
 					if err != nil {
 						logrus.WithError(err).Error("checkApprove: set input data")
 						continue

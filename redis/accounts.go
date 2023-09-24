@@ -37,10 +37,13 @@ func (r *Redis) GetAllAccounts(ctx context.Context) (accounts []string, err erro
 	return
 }
 
-func (r *Redis) SetInputData(ctx context.Context, uuid string, accountAddress string, inputData []byte) (err error) {
+func (r *Redis) SetInputData(ctx context.Context, uuid string, accountAddress string, inputData []byte, chainId int, chainName string, targetContract string) (err error) {
 	accountAndInputData := types.AccountAndInputData{
 		AccountAddress: accountAddress,
+		TargetContract: targetContract,
 		InputData:      inputData,
+		ChainId:        chainId,
+		ChainName:      chainName,
 	}
 	aaid, err := accountAndInputData.MarshalMsg(nil)
 	if err != nil {
@@ -65,10 +68,28 @@ func (r *Redis) GetInputData(ctx context.Context, uuid string) (aaid *types.Acco
 	return
 }
 
+func (r *Redis) SetOpt2ChatId(ctx context.Context, opt int, chatId int64) error {
+	return r.setAndCheck(ctx, opt2ChatIdKey(opt), chatId, "SetOpt2ChatId")
+}
+
+func (r *Redis) GetOpt2ChatId(ctx context.Context, opt int) (chatId int64, err error) {
+	cmd := r.redis.Get(ctx, opt2ChatIdKey(opt))
+	chatId, err = cmd.Int64()
+	if err != nil {
+		logrus.WithError(err).Error("GetOpt2Chatid: redis get")
+		return
+	}
+	return chatId, nil
+}
+
 func accountInfoKey(accountAddress string) string {
 	return fmt.Sprintf("%s.%s", ACCOUNT_INFO, strings.ToLower(accountAddress))
 }
 
 func uuidKey(uuid string) string {
 	return fmt.Sprintf("%s.%s", UUID, uuid)
+}
+
+func opt2ChatIdKey(opt int) string {
+	return fmt.Sprintf("%s.%d", OPT_2_CHAT_ID, opt)
 }

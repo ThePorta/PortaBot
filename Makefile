@@ -1,4 +1,4 @@
-all: bot.bin
+all: bot.bin server.bin
 
 clean:
 	rm -rf bin/*

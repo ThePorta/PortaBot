@@ -13,8 +13,9 @@ const (
 	MALICIOUS_ALTER = "maliciousAlter"
 
 	// accounts keys
-	ACCOUNT_INFO = "account"
-	UUID         = "uuid"
+	ACCOUNT_INFO  = "account"
+	UUID          = "uuid"
+	OPT_2_CHAT_ID = "opt2chatid"
 )
 
 type Redis struct {

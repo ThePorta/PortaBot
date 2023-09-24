@@ -30,10 +30,28 @@ func (z *AccountAndInputData) DecodeMsg(dc *msgp.Reader) (err error) {
 				err = msgp.WrapError(err, "AccountAddress")
 				return
 			}
+		case "TargetContract":
+			z.TargetContract, err = dc.ReadString()
+			if err != nil {
+				err = msgp.WrapError(err, "TargetContract")
+				return
+			}
 		case "InputData":
 			z.InputData, err = dc.ReadBytes(z.InputData)
 			if err != nil {
 				err = msgp.WrapError(err, "InputData")
+				return
+			}
+		case "ChainId":
+			z.ChainId, err = dc.ReadInt()
+			if err != nil {
+				err = msgp.WrapError(err, "ChainId")
+				return
+			}
+		case "ChainName":
+			z.ChainName, err = dc.ReadString()
+			if err != nil {
+				err = msgp.WrapError(err, "ChainName")
 				return
 			}
 		default:
@@ -49,15 +67,25 @@ func (z *AccountAndInputData) DecodeMsg(dc *msgp.Reader) (err error) {
 
 // EncodeMsg implements msgp.Encodable
 func (z *AccountAndInputData) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 2
+	// map header, size 5
 	// write "AccountAddress"
-	err = en.Append(0x82, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
+	err = en.Append(0x85, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
 	if err != nil {
 		return
 	}
 	err = en.WriteString(z.AccountAddress)
 	if err != nil {
 		err = msgp.WrapError(err, "AccountAddress")
+		return
+	}
+	// write "TargetContract"
+	err = en.Append(0xae, 0x54, 0x61, 0x72, 0x67, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74)
+	if err != nil {
+		return
+	}
+	err = en.WriteString(z.TargetContract)
+	if err != nil {
+		err = msgp.WrapError(err, "TargetContract")
 		return
 	}
 	// write "InputData"
@@ -70,19 +98,48 @@ func (z *AccountAndInputData) EncodeMsg(en *msgp.Writer) (err error) {
 		err = msgp.WrapError(err, "InputData")
 		return
 	}
+	// write "ChainId"
+	err = en.Append(0xa7, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x49, 0x64)
+	if err != nil {
+		return
+	}
+	err = en.WriteInt(z.ChainId)
+	if err != nil {
+		err = msgp.WrapError(err, "ChainId")
+		return
+	}
+	// write "ChainName"
+	err = en.Append(0xa9, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x4e, 0x61, 0x6d, 0x65)
+	if err != nil {
+		return
+	}
+	err = en.WriteString(z.ChainName)
+	if err != nil {
+		err = msgp.WrapError(err, "ChainName")
+		return
+	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
 func (z *AccountAndInputData) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 2
+	// map header, size 5
 	// string "AccountAddress"
-	o = append(o, 0x82, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
+	o = append(o, 0x85, 0xae, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
 	o = msgp.AppendString(o, z.AccountAddress)
+	// string "TargetContract"
+	o = append(o, 0xae, 0x54, 0x61, 0x72, 0x67, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74)
+	o = msgp.AppendString(o, z.TargetContract)
 	// string "InputData"
 	o = append(o, 0xa9, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x44, 0x61, 0x74, 0x61)
 	o = msgp.AppendBytes(o, z.InputData)
+	// string "ChainId"
+	o = append(o, 0xa7, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x49, 0x64)
+	o = msgp.AppendInt(o, z.ChainId)
+	// string "ChainName"
+	o = append(o, 0xa9, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x4e, 0x61, 0x6d, 0x65)
+	o = msgp.AppendString(o, z.ChainName)
 	return
 }
 
@@ -110,10 +167,28 @@ func (z *AccountAndInputData) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				err = msgp.WrapError(err, "AccountAddress")
 				return
 			}
+		case "TargetContract":
+			z.TargetContract, bts, err = msgp.ReadStringBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "TargetContract")
+				return
+			}
 		case "InputData":
 			z.InputData, bts, err = msgp.ReadBytesBytes(bts, z.InputData)
 			if err != nil {
 				err = msgp.WrapError(err, "InputData")
+				return
+			}
+		case "ChainId":
+			z.ChainId, bts, err = msgp.ReadIntBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "ChainId")
+				return
+			}
+		case "ChainName":
+			z.ChainName, bts, err = msgp.ReadStringBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "ChainName")
 				return
 			}
 		default:
@@ -130,6 +205,6 @@ func (z *AccountAndInputData) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *AccountAndInputData) Msgsize() (s int) {
-	s = 1 + 15 + msgp.StringPrefixSize + len(z.AccountAddress) + 10 + msgp.BytesPrefixSize + len(z.InputData)
+	s = 1 + 15 + msgp.StringPrefixSize + len(z.AccountAddress) + 15 + msgp.StringPrefixSize + len(z.TargetContract) + 10 + msgp.BytesPrefixSize + len(z.InputData) + 8 + msgp.IntSize + 10 + msgp.StringPrefixSize + len(z.ChainName)
 	return
 }
