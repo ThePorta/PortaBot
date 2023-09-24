@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (r *Redis) StoreAccountInfo(ctx context.Context, accountAddress string, chatId int64) (err error) {
+func (r *Redis) SetAccountInfo(ctx context.Context, accountAddress string, chatId int64) (err error) {
 	return r.setAndCheck(ctx, accountInfoKey(accountAddress), chatId, "StoreAccountInfo: set")
 }
 

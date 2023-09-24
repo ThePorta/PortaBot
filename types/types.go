@@ -9,3 +9,8 @@ type AccountAndInputData struct {
 	ChainId        int    `json:"chainId"`
 	ChainName      string `json:"chainName"`
 }
+
+type SetChatIdRequest struct {
+	Opt     int    `json:"opt"`
+	Address string `json:"address"`
+}

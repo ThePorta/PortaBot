@@ -71,14 +71,20 @@ func getInputData(c echo.Context) error {
 }
 
 func setChatId(c echo.Context) error {
-	optStr := c.FormValue("opt")
-	opt, err := strconv.Atoi(optStr)
+	setChatIdReq := new(types.SetChatIdRequest)
+	c.Bind(setChatIdReq)
+	chatId, err := redisClient.GetOpt2ChatId(context.Background(), setChatIdReq.Opt)
 	if err != nil {
+		logrus.WithError(err).Errorf("setChatId: opt: %d", setChatIdReq.Opt)
 		return err
 	}
-	_, err = redisClient.GetOpt2ChatId(context.Background(), opt)
+	err = redisClient.SetAccountInfo(context.Background(), setChatIdReq.Address, chatId)
+	if err != nil {
+		logrus.WithError(err).Errorf("setChatId: address: %s", setChatIdReq.Address)
+		return err
+	}
 
-	return nil
+	return c.String(http.StatusOK, "")
 }
 
 func getApproveInputData(maliciousAddress string) ([]byte, error) {
