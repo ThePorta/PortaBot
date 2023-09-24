@@ -16,7 +16,7 @@ const (
 	// accounts keys
 	ACCOUNT_INFO  = "account"
 	UUID          = "uuid"
-	OPT_2_CHAT_ID = "opt2chatid"
+	OTP_2_CHAT_ID = "otp2chatid"
 )
 
 type Redis struct {

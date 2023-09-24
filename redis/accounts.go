@@ -92,5 +92,5 @@ func uuidKey(uuid string) string {
 }
 
 func opt2ChatIdKey(otp string) string {
-	return fmt.Sprintf("%s.%s", OPT_2_CHAT_ID, otp)
+	return fmt.Sprintf("%s.%s", OTP_2_CHAT_ID, otp)
 }
