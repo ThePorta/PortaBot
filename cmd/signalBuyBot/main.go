@@ -142,6 +142,6 @@ func execBuyETH(ctx context.Context, bot *tgbotapi.BotAPI, chatId int64, amountI
 	}
 
 	logrus.Info(fmt.Sprintf("UUID : %s", uuidStr))
-	msg := tgbotapi.NewMessage(chatId, fmt.Sprintf("https://localhost:3000/submitTx?uuit=%s", uuidStr))
+	msg := tgbotapi.NewMessage(chatId, fmt.Sprintf("http://localhost:3000/submitTx?uuid=%s", uuidStr))
 	bot.Send(msg)
 }
