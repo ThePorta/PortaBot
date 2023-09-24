@@ -11,6 +11,6 @@ type AccountAndInputData struct {
 }
 
 type SetChatIdRequest struct {
-	Otp     int    `json:"otp"`
+	Otp     string `json:"otp"`
 	Address string `json:"address"`
 }

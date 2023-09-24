@@ -79,8 +79,7 @@ func main() {
 				optCode := generateOptCode()
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Hello %s, Your OTP code is: %s", update.Message.From.FirstName, optCode))
 				bot.Send(msg)
-				optCodeInt, _ := strconv.Atoi(optCode)
-				redisClient.SetOpt2ChatId(ctx, optCodeInt, update.Message.Chat.ID)
+				redisClient.SetOpt2ChatId(ctx, optCode, update.Message.Chat.ID)
 			}
 		case maliciousAddress := <-maliciousAddressCh:
 			checkApprove(ctx, maliciousAddress.Payload, bot)

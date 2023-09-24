@@ -2,19 +2,15 @@ package main
 
 import (
 	"context"
-	"math/big"
 	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/ThePorta/PortaBot/redis"
 	"github.com/ThePorta/PortaBot/types"
-	"github.com/ThePorta/PortaBot/utils"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/lmittmann/w3"
 	"github.com/sirupsen/logrus"
 )
 
@@ -64,9 +60,10 @@ func getInputData(c echo.Context) error {
 func setChatId(c echo.Context) error {
 	setChatIdReq := new(types.SetChatIdRequest)
 	c.Bind(setChatIdReq)
+	logrus.Infof("%+v", setChatIdReq)
 	chatId, err := redisClient.GetOpt2ChatId(context.Background(), setChatIdReq.Otp)
 	if err != nil {
-		logrus.WithError(err).Errorf("setChatId: otp: %d", setChatIdReq.Otp)
+		logrus.WithError(err).Errorf("setChatId: otp: %s", setChatIdReq.Otp)
 		return err
 	}
 	err = redisClient.SetAccountInfo(context.Background(), setChatIdReq.Address, chatId)
@@ -76,14 +73,4 @@ func setChatId(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, "")
-}
-
-func getApproveInputData(maliciousAddress string) (string, error) {
-	funcApprove := w3.MustNewFunc("approve(address,uint256)", "bool")
-	input, err := funcApprove.EncodeArgs(common.HexToAddress(maliciousAddress), big.NewInt(0))
-	if err != nil {
-		logrus.WithError(err).Errorf("getApproveInputData: encode args: malicious address: %s", maliciousAddress)
-		return "", err
-	}
-	return utils.Bytes2Hex(input), nil
 }

@@ -69,11 +69,11 @@ func (r *Redis) GetInputData(ctx context.Context, uuid string) (aaid *types.Acco
 	return
 }
 
-func (r *Redis) SetOpt2ChatId(ctx context.Context, otp int, chatId int64) error {
+func (r *Redis) SetOpt2ChatId(ctx context.Context, otp string, chatId int64) error {
 	return r.setAndCheck(ctx, opt2ChatIdKey(otp), chatId, "SetOpt2ChatId")
 }
 
-func (r *Redis) GetOpt2ChatId(ctx context.Context, otp int) (chatId int64, err error) {
+func (r *Redis) GetOpt2ChatId(ctx context.Context, otp string) (chatId int64, err error) {
 	cmd := r.redis.Get(ctx, opt2ChatIdKey(otp))
 	chatId, err = cmd.Int64()
 	if err != nil {
@@ -91,6 +91,6 @@ func uuidKey(uuid string) string {
 	return fmt.Sprintf("%s.%s", UUID, uuid)
 }
 
-func opt2ChatIdKey(otp int) string {
-	return fmt.Sprintf("%s.%d", OPT_2_CHAT_ID, otp)
+func opt2ChatIdKey(otp string) string {
+	return fmt.Sprintf("%s.%s", OPT_2_CHAT_ID, otp)
 }
