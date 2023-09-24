@@ -227,10 +227,10 @@ func (z *SetChatIdRequest) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "Opt":
-			z.Opt, err = dc.ReadInt()
+		case "Otp":
+			z.Otp, err = dc.ReadInt()
 			if err != nil {
-				err = msgp.WrapError(err, "Opt")
+				err = msgp.WrapError(err, "Otp")
 				return
 			}
 		case "Address":
@@ -253,14 +253,14 @@ func (z *SetChatIdRequest) DecodeMsg(dc *msgp.Reader) (err error) {
 // EncodeMsg implements msgp.Encodable
 func (z SetChatIdRequest) EncodeMsg(en *msgp.Writer) (err error) {
 	// map header, size 2
-	// write "Opt"
+	// write "Otp"
 	err = en.Append(0x82, 0xa3, 0x4f, 0x70, 0x74)
 	if err != nil {
 		return
 	}
-	err = en.WriteInt(z.Opt)
+	err = en.WriteInt(z.Otp)
 	if err != nil {
-		err = msgp.WrapError(err, "Opt")
+		err = msgp.WrapError(err, "Otp")
 		return
 	}
 	// write "Address"
@@ -280,9 +280,9 @@ func (z SetChatIdRequest) EncodeMsg(en *msgp.Writer) (err error) {
 func (z SetChatIdRequest) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// map header, size 2
-	// string "Opt"
+	// string "Otp"
 	o = append(o, 0x82, 0xa3, 0x4f, 0x70, 0x74)
-	o = msgp.AppendInt(o, z.Opt)
+	o = msgp.AppendInt(o, z.Otp)
 	// string "Address"
 	o = append(o, 0xa7, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73)
 	o = msgp.AppendString(o, z.Address)
@@ -307,10 +307,10 @@ func (z *SetChatIdRequest) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
-		case "Opt":
-			z.Opt, bts, err = msgp.ReadIntBytes(bts)
+		case "Otp":
+			z.Otp, bts, err = msgp.ReadIntBytes(bts)
 			if err != nil {
-				err = msgp.WrapError(err, "Opt")
+				err = msgp.WrapError(err, "Otp")
 				return
 			}
 		case "Address":

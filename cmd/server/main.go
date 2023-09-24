@@ -75,9 +75,9 @@ func getInputData(c echo.Context) error {
 func setChatId(c echo.Context) error {
 	setChatIdReq := new(types.SetChatIdRequest)
 	c.Bind(setChatIdReq)
-	chatId, err := redisClient.GetOpt2ChatId(context.Background(), setChatIdReq.Opt)
+	chatId, err := redisClient.GetOpt2ChatId(context.Background(), setChatIdReq.Otp)
 	if err != nil {
-		logrus.WithError(err).Errorf("setChatId: opt: %d", setChatIdReq.Opt)
+		logrus.WithError(err).Errorf("setChatId: otp: %d", setChatIdReq.Otp)
 		return err
 	}
 	err = redisClient.SetAccountInfo(context.Background(), setChatIdReq.Address, chatId)
