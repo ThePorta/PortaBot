@@ -103,11 +103,11 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 		}
 		defer client.Close()
 		funcAllowance := w3.MustNewFunc("allowance(address,address)", "uint256")
-		for _, token := range chain.SupportedTokens {
+		for tokenName, tokenAddr := range chain.SupportedTokens {
 			for _, account := range accounts {
 				var allowanceAmount big.Int
 				client.Call(
-					eth.CallFunc(w3.A(token.Address), funcAllowance, w3.A(account), w3.A(maliciousAddress)).Returns(&allowanceAmount),
+					eth.CallFunc(w3.A(tokenAddr), funcAllowance, w3.A(account), w3.A(maliciousAddress)).Returns(&allowanceAmount),
 				)
 				if allowanceAmount.Cmp(big.NewInt(0)) > 0 {
 					chatId, err := redisClient.GetAccountInfo(ctx, account)
@@ -120,13 +120,13 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 						logrus.WithError(err).Error("checkApprove: encode input data")
 						continue
 					}
-					err = redisClient.SetInputData(ctx, uuidStr, account, signInputData, chain.ChainId, chain.ChainName, token.Address)
+					err = redisClient.SetInputData(ctx, uuidStr, account, signInputData, chain.ChainId, chain.ChainName, tokenAddr)
 					if err != nil {
 						logrus.WithError(err).Error("checkApprove: set input data")
 						continue
 					}
 
-					msg := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please open %s/%s to revoke", account, maliciousAddress, allowanceAmount.String(), token.Name, chain.ChainName, config.URL, uuidStr))
+					msg := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please open %s/%s to revoke", account, maliciousAddress, allowanceAmount.String(), tokenName, chain.ChainName, config.URL, uuidStr))
 					bot.Send(msg)
 				}
 			}

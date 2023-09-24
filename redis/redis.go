@@ -11,6 +11,7 @@ const (
 	// channel
 	REVOKE          = "revoke"
 	MALICIOUS_ALTER = "maliciousAlter"
+	ETH_BUY_SIGNAL  = "ethBuySignal"
 
 	// accounts keys
 	ACCOUNT_INFO  = "account"
