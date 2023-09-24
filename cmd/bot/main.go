@@ -79,9 +79,12 @@ func main() {
 				optCode := generateOptCode()
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Hello %s, Your OTP code is: %s", update.Message.From.FirstName, optCode))
 				bot.Send(msg)
+				logrus.Info(optCode)
+				logrus.Info(update.Message.Chat.ID)
 				redisClient.SetOpt2ChatId(ctx, optCode, update.Message.Chat.ID)
 			}
 		case maliciousAddress := <-maliciousAddressCh:
+			logrus.Debugf("get malicious address: %s", maliciousAddress)
 			checkApprove(ctx, maliciousAddress.Payload, bot)
 		}
 	}
@@ -97,6 +100,7 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 		logrus.WithError(err).Error("checkApprove: fail to get all accounts")
 		return
 	}
+	logrus.Debugf("%+v", accounts)
 
 	for _, chain := range config.ChainConfigs {
 		client, err := w3.Dial(chain.EndpointUrl)
@@ -112,6 +116,7 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 				client.Call(
 					eth.CallFunc(common.HexToAddress(tokenAddr), funcAllowance, common.HexToAddress(account), common.HexToAddress(maliciousAddress)).Returns(&allowanceAmount),
 				)
+				logrus.Debugf("account: %s, token: %s, chain: %s, allowance: %s", account, tokenAddr, chain.ChainName, allowanceAmount.String())
 				if allowanceAmount.Cmp(big.NewInt(0)) > 0 {
 					chatId, err := redisClient.GetAccountInfo(ctx, account)
 					if err != nil {
