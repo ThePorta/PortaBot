@@ -14,6 +14,7 @@ import (
 
 	"github.com/ThePorta/PortaBot/config"
 	"github.com/ThePorta/PortaBot/redis"
+	"github.com/ThePorta/PortaBot/utils"
 	"github.com/ethereum/go-ethereum/common"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
@@ -135,7 +136,7 @@ func execBuyETH(ctx context.Context, bot *tgbotapi.BotAPI, chatId int64, amountI
 	chain := config.ChainConfigs[0]
 	// inputHexString := hexutil.Encode(input)
 	uuidStr := uuid.New().String()
-	err = redisClient.SetInputData(ctx, uuidStr, recipient, input, chain.ChainId, chain.ChainName, UNISWAP_SR02)
+	err = redisClient.SetInputData(ctx, uuidStr, recipient, utils.Bytes2Hex(input), chain.ChainId, chain.ChainName, UNISWAP_SR02)
 	if err != nil {
 		panic(err)
 	}

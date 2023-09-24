@@ -5,7 +5,7 @@ package types
 type AccountAndInputData struct {
 	AccountAddress string `json:"accountAddress"`
 	TargetContract string `json:"targetContract"`
-	InputData      []byte `json:"inputData"`
+	InputData      string `json:"inputData"`
 	ChainId        int    `json:"chainId"`
 	ChainName      string `json:"chainName"`
 }

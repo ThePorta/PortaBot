@@ -37,7 +37,7 @@ func (r *Redis) GetAllAccounts(ctx context.Context) (accounts []string, err erro
 	return
 }
 
-func (r *Redis) SetInputData(ctx context.Context, uuid string, accountAddress string, inputData []byte, chainId int, chainName string, targetContract string) (err error) {
+func (r *Redis) SetInputData(ctx context.Context, uuid string, accountAddress string, inputData string, chainId int, chainName string, targetContract string) (err error) {
 	accountAndInputData := types.AccountAndInputData{
 		AccountAddress: accountAddress,
 		TargetContract: targetContract,

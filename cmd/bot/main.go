@@ -14,6 +14,7 @@ import (
 
 	"github.com/ThePorta/PortaBot/config"
 	"github.com/ThePorta/PortaBot/redis"
+	"github.com/ThePorta/PortaBot/utils"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -122,14 +123,18 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 						logrus.WithError(err).Error("checkApprove: encode input data")
 						continue
 					}
-					err = redisClient.SetInputData(ctx, uuidStr, account, signInputData, chain.ChainId, chain.ChainName, tokenAddr)
+
+					msgConfig := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please open %s/%s to revoke", account, maliciousAddress, allowanceAmount.String(), tokenName, chain.ChainName, config.URL, uuidStr))
+					_, err = bot.Send(msgConfig)
+					if err != nil {
+						logrus.WithError(err).Errorf("checkApprove: send message: chatId: %+v", msgConfig)
+						continue
+					}
+					err = redisClient.SetInputData(ctx, uuidStr, account, utils.Bytes2Hex(signInputData), chain.ChainId, chain.ChainName, tokenAddr)
 					if err != nil {
 						logrus.WithError(err).Error("checkApprove: set input data")
 						continue
 					}
-
-					msg := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please open %s/%s to revoke", account, maliciousAddress, allowanceAmount.String(), tokenName, chain.ChainName, config.URL, uuidStr))
-					bot.Send(msg)
 				}
 			}
 		}

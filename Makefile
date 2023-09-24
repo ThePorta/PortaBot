@@ -1,4 +1,4 @@
-all: bot.bin server.bin
+all: bot.bin server.bin signalBuyBot.bin
 
 clean:
 	rm -rf bin/*
