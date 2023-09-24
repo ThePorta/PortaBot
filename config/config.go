@@ -7,7 +7,7 @@ type ChainConfig struct {
 	SupportedTokens map[string]string
 }
 
-const URL = "http://127.0.0.1:3000/"
+const URL = "http://127.0.0.1:3000"
 
 var ChainConfigs = []*ChainConfig{
 	{
