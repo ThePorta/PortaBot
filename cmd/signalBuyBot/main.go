@@ -128,7 +128,7 @@ func execBuyETH(ctx context.Context, bot *tgbotapi.BotAPI, chatId int64, amountI
 	// in, minOut, path, recipient
 	uniFunc := w3.MustNewFunc("swapExactTokensForTokens(uint256,uint256,address[],address)", "uint256")
 
-	input, err := uniFunc.EncodeArgs(amountIn, big.NewInt(0), []common.Address{w3.A(USDC), w3.A(WETH)}, w3.A(recipient))
+	input, err := uniFunc.EncodeArgs(amountIn, big.NewInt(0), []common.Address{common.HexToAddress(USDC), common.HexToAddress(WETH)}, common.HexToAddress(recipient))
 	if err != nil {
 		panic(err)
 	}

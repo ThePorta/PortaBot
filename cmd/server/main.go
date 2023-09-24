@@ -10,6 +10,7 @@ import (
 	"github.com/ThePorta/PortaBot/redis"
 	"github.com/ThePorta/PortaBot/types"
 	"github.com/ThePorta/PortaBot/utils"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -90,7 +91,7 @@ func setChatId(c echo.Context) error {
 
 func getApproveInputData(maliciousAddress string) (string, error) {
 	funcApprove := w3.MustNewFunc("approve(address,uint256)", "bool")
-	input, err := funcApprove.EncodeArgs(w3.A(maliciousAddress), big.NewInt(0))
+	input, err := funcApprove.EncodeArgs(common.HexToAddress(maliciousAddress), big.NewInt(0))
 	if err != nil {
 		logrus.WithError(err).Errorf("getApproveInputData: encode args: malicious address: %s", maliciousAddress)
 		return "", err

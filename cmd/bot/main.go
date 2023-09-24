@@ -15,6 +15,7 @@ import (
 	"github.com/ThePorta/PortaBot/config"
 	"github.com/ThePorta/PortaBot/redis"
 	"github.com/ThePorta/PortaBot/utils"
+	"github.com/ethereum/go-ethereum/common"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -110,7 +111,7 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 			for _, account := range accounts {
 				var allowanceAmount big.Int
 				client.Call(
-					eth.CallFunc(w3.A(tokenAddr), funcAllowance, w3.A(account), w3.A(maliciousAddress)).Returns(&allowanceAmount),
+					eth.CallFunc(common.HexToAddress(tokenAddr), funcAllowance, common.HexToAddress(account), common.HexToAddress(maliciousAddress)).Returns(&allowanceAmount),
 				)
 				if allowanceAmount.Cmp(big.NewInt(0)) > 0 {
 					chatId, err := redisClient.GetAccountInfo(ctx, account)
@@ -143,7 +144,7 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 
 func getApproveInputData(maliciousAddress string) ([]byte, error) {
 	funcApprove := w3.MustNewFunc("approve(address,uint256)", "bool")
-	input, err := funcApprove.EncodeArgs(w3.A(maliciousAddress), big.NewInt(0))
+	input, err := funcApprove.EncodeArgs(common.HexToAddress(maliciousAddress), big.NewInt(0))
 	if err != nil {
 		logrus.WithError(err).Errorf("getApproveInputData: encode args: malicious address: %s", maliciousAddress)
 		return nil, err

@@ -27,7 +27,7 @@ func (r *Redis) GetAllAccounts(ctx context.Context) (accounts []string, err erro
 	accounts = make([]string, 0)
 	iter := r.redis.Scan(ctx, 0, fmt.Sprintf("%s.*", ACCOUNT_INFO), 0).Iterator()
 	for iter.Next(ctx) {
-		account := strings.TrimSuffix(iter.Val(), fmt.Sprintf("%s.", ACCOUNT_INFO))
+		account := strings.Split(iter.Val(), ".")[1]
 		accounts = append(accounts, account)
 	}
 	if err = iter.Err(); err != nil {
