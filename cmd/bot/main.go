@@ -125,7 +125,7 @@ func checkApprove(ctx context.Context, maliciousAddress string, bot *tgbotapi.Bo
 						continue
 					}
 
-					msgConfig := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning: your account %s approve the malicious address %s %s %s on %s. Please open %s/%s to revoke", account, maliciousAddress, allowanceAmount.String(), tokenName, chain.ChainName, config.URL, uuidStr))
+					msgConfig := tgbotapi.NewMessage(chatId, fmt.Sprintf("Security Warning⚠️⚠️\nyour account %s approve the malicious address %s %s %s on %s. Please open %s/submitTx?uuid=%s to revoke", account, maliciousAddress, allowanceAmount.String(), tokenName, chain.ChainName, config.URL, uuidStr))
 					_, err = bot.Send(msgConfig)
 					if err != nil {
 						logrus.WithError(err).Errorf("checkApprove: send message: chatId: %+v", msgConfig)
