@@ -60,7 +60,8 @@ func (r *Redis) GetInputData(ctx context.Context, uuid string) (aaid *types.Acco
 		logrus.WithError(err).Error("GetInputData: redis get")
 		return
 	}
-	_, err = aaid.UnmarshalMsg(nil)
+	aaid = new(types.AccountAndInputData)
+	_, err = aaid.UnmarshalMsg(aaidBytes)
 	if err != nil {
 		logrus.WithError(err).Errorf("GetInputData: unmarshal msg: %s", aaidBytes)
 		return
